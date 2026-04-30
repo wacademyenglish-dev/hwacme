@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ACME Corp: Legal Assessment</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        acme: {
+                            yellow: '#fde047',
+                            red: '#ef4444',
+                            blue: '#3b82f6',
+                            dark: '#0f172a',
+                            white: '#ffffff',
+                            green: '#22c55e'
+                        }
+                    },
+                    fontFamily: {
+                        comic: ['Bangers', 'cursive'],
+                        base: ['Nunito', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #cbd5e1; /* Slate 300 background for desktop */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            background-image: radial-gradient(#94a3b8 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+
+        /* Mobile Container Simulation */
+        #mobile-container {
+            width: 100%;
+            max-width: 400px;
+            height: 100dvh;
+            max-height: 850px;
+            background-color: #fde047;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 12px 12px 0px #0f172a;
+        }
+
+        @media (min-width: 480px) {
+            #mobile-container {
+                height: 90vh;
+                border-radius: 1.5rem;
+                border: 6px solid #0f172a;
+            }
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Screen Transitions */
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            background-color: #fde047;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+        .screen.active { transform: translateX(0); z-index: 20; }
+        .screen.previous { transform: translateX(-100%); z-index: 10; }
+
+        /* Option Buttons (Neo-Brutalist) */
+        .option-btn {
+            background-color: #ffffff;
+            border: 4px solid #0f172a;
+            color: #0f172a;
+            font-weight: 900;
+            border-radius: 12px;
+            box-shadow: 4px 4px 0px #0f172a;
+            transition: all 0.15s ease;
+        }
+        .option-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #0f172a;
+        }
+        .option-btn.selected {
+            background-color: #3b82f6;
+            color: #ffffff;
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #0f172a;
+        }
+        .option-btn.correct {
+            background-color: #22c55e;
+            color: #0f172a;
+            border-color: #0f172a;
+        }
+        .option-btn.wrong {
+            background-color: #ef4444;
+            color: #ffffff;
+        }
+
+        /* Custom Action Button */
+        .acme-action-btn {
+            background-color: #ef4444;
+            color: #ffffff;
+            border: 4px solid #0f172a;
+            box-shadow: 6px 6px 0px #0f172a;
+            border-radius: 12px;
+            font-family: 'Bangers', cursive;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            transition: all 0.1s ease;
+            cursor: pointer;
+        }
+        .acme-action-btn:active:not(:disabled) {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px #0f172a;
+        }
+        .acme-action-btn:disabled {
+            background-color: #94a3b8;
+            color: #e2e8f0;
+            box-shadow: 4px 4px 0px #475569;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Progress Bar */
+        .progress-track {
+            background-color: #ffffff;
+            border-bottom: 4px solid #0f172a;
+        }
+        .progress-fill {
+            background-color: #ef4444;
+            transition: width 0.3s ease;
+            border-right: 4px solid #0f172a;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- DEVICE CONTAINER -->
+    <div id="mobile-container">
+
+        <!-- STATUS BAR -->
+        <div class="h-8 bg-acme-dark text-white flex justify-between items-center px-4 text-xs font-bold z-50 shrink-0 uppercase tracking-widest">
+            <span id="clock">12:00</span>
+            <div class="flex gap-2 items-center">
+                <span>ACME LEGAL OS</span>
+                <span>🧨 100%</span>
+            </div>
+        </div>
+
+        <!-- SCREEN 1: LOGIN -->
+        <div id="screen-login" class="screen active flex items-center justify-center p-6 text-center">
+            
+            <div class="z-10 w-full flex flex-col items-center">
+                <div class="w-24 h-24 bg-white border-4 border-acme-dark rounded-2xl flex items-center justify-center mb-8 shadow-[6px_6px_0px_#0f172a] transform -rotate-6">
+                    <span class="text-6xl">⚖️</span>
+                </div>
+                
+                <h2 class="font-black text-sm tracking-widest text-acme-blue mb-2 uppercase bg-white px-3 py-1 border-2 border-acme-dark rounded-lg inline-block transform rotate-2">Assessment</h2>
+                <h1 class="font-comic text-5xl tracking-widest mb-4 text-acme-dark uppercase drop-shadow-[2px_2px_0px_#ffffff]">ACME Corp</h1>
+                <p class="font-base text-lg font-bold text-slate-700 mb-12 leading-relaxed bg-white/50 p-4 rounded-xl border-2 border-dashed border-acme-dark">
+                    "Prove you are a good lawyer. Complete the grammar and vocabulary test."
+                </p>
+
+                <button onclick="startQuiz()" class="w-full acme-action-btn py-4">
+                    START TRIAL
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: QUIZ -->
+        <div id="screen-quiz" class="screen flex flex-col bg-white">
+            <!-- Header -->
+            <header class="bg-acme-yellow border-b-4 border-acme-dark p-4 shrink-0 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">📦</span>
+                    <span class="font-comic text-acme-dark uppercase tracking-widest text-xl mt-1" id="q-category">VOCABULARY</span>
+                </div>
+                <span class="font-black text-acme-dark text-lg bg-white px-3 py-1 border-2 border-acme-dark rounded-lg shadow-[2px_2px_0px_#0f172a]" id="q-counter">1/15</span>
+            </header>
+
+            <!-- Progress Bar -->
+            <div class="w-full h-3 progress-track shrink-0 flex">
+                <div id="progress-bar" class="h-full progress-fill" style="width: 0%;"></div>
+            </div>
+
+            <!-- Scrollable Content Area -->
+            <div class="flex-1 overflow-y-auto no-scrollbar p-6 flex flex-col bg-slate-50">
+                
+                <!-- Question Text -->
+                <h2 id="q-text" class="text-2xl font-black text-acme-dark mb-8 leading-snug bg-white p-6 border-4 border-acme-dark rounded-2xl shadow-[4px_4px_0px_#0f172a]">
+                    Question goes here?
+                </h2>
+
+                <!-- Options Grid -->
+                <div id="options-container" class="flex flex-col gap-4 mb-8">
+                    <!-- Options injected via JS -->
+                </div>
+
+                <!-- Spacer -->
+                <div class="flex-1"></div>
+
+                <!-- Feedback Area -->
+                <div id="feedback-area" class="hidden mb-6 p-4 rounded-xl font-bold text-lg border-4 shadow-[4px_4px_0px_#0f172a] text-center uppercase tracking-widest">
+                    Feedback goes here
+                </div>
+
+            </div>
+
+            <!-- Bottom Action Bar -->
+            <div class="p-4 bg-acme-yellow border-t-4 border-acme-dark shrink-0">
+                <button id="btn-next" onclick="handleNext()" disabled class="w-full acme-action-btn py-4">
+                    CONFIRM ANSWER
+                </button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: RESULTS -->
+        <div id="screen-results" class="screen flex flex-col bg-acme-blue">
+            <header class="bg-acme-dark text-white p-4 shrink-0 text-center border-b-4 border-black">
+                <span class="font-black uppercase tracking-widest text-sm">CASE VERDICT</span>
+            </header>
+
+            <div class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                <div id="result-icon" class="text-8xl mb-6 bg-white w-32 h-32 flex items-center justify-center rounded-full border-4 border-acme-dark shadow-[8px_8px_0px_#0f172a]">🐺</div>
+                
+                <div class="bg-white w-full p-8 border-4 border-acme-dark rounded-2xl shadow-[8px_8px_0px_#0f172a] mb-8 relative">
+                    <div class="absolute -top-4 -right-4 text-4xl transform rotate-12">📝</div>
+                    <h1 id="result-title" class="text-4xl font-comic text-acme-dark mb-2 tracking-wider">Super Genius</h1>
+                    <p id="result-subtitle" class="text-xl font-black text-slate-500 mb-6 border-b-2 border-dashed border-slate-300 pb-4">Score: <span id="final-score" class="text-acme-red text-3xl">15</span> / 15</p>
+                    
+                    <p id="result-msg" class="font-bold text-lg text-acme-dark leading-relaxed italic">
+                        "You won the case against ACME!"
+                    </p>
+                </div>
+
+                <button onclick="restartApp()" class="w-full acme-action-btn py-4 bg-acme-yellow text-acme-dark hover:bg-white transition-colors">
+                    PLAY AGAIN
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- 1. Clock Update ---
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('clock').innerText = timeString;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // --- 2. Questions Database (15 Questions - A1 Level) ---
+        const questions = [
+            // VOCABULARY
+            {
+                category: "Vocabulary",
+                question: "Which word means 'very quick'?",
+                options: ["Slow", "Fast", "Hurt"],
+                correctIndex: 1,
+                explanation: "The Road Runner is very FAST."
+            },
+            {
+                category: "Vocabulary",
+                question: "What is the opposite of 'happy'?",
+                options: ["Angry", "Fast", "Box"],
+                correctIndex: 0,
+                explanation: "The Coyote is always ANGRY."
+            },
+            {
+                category: "Vocabulary",
+                question: "The Road Runner is a...",
+                options: ["Dog", "Bird", "Coyote"],
+                correctIndex: 1,
+                explanation: "He is a very fast BIRD."
+            },
+            {
+                category: "Vocabulary",
+                question: "What object makes music?",
+                options: ["Paint", "Rocket", "Piano"],
+                correctIndex: 2,
+                explanation: "A PIANO makes music (and falls from the sky)."
+            },
+            {
+                category: "Vocabulary",
+                question: "If you do dangerous things, you are...",
+                options: ["Reckless", "Slow", "Happy"],
+                correctIndex: 0,
+                explanation: "The Coyote is RECKLESS. He uses bombs."
+            },
+            // GRAMMAR 1: VERB TO BE
+            {
+                category: "Grammar: To Be",
+                question: "Complete the sentence: 'I ___ a lawyer.'",
+                options: ["is", "are", "am"],
+                correctIndex: 2,
+                explanation: "We use 'AM' with 'I'."
+            },
+            {
+                category: "Grammar: To Be",
+                question: "Complete the sentence: 'The Coyote ___ happy.' (Negative)",
+                options: ["am not", "is not", "are not"],
+                correctIndex: 1,
+                explanation: "We use 'IS NOT' for he/she/it."
+            },
+            {
+                category: "Grammar: To Be",
+                question: "Complete the sentence: 'The ACME boxes ___ heavy.'",
+                options: ["is", "am", "are"],
+                correctIndex: 2,
+                explanation: "'Boxes' is plural (they), so we use 'ARE'."
+            },
+            {
+                category: "Grammar: To Be",
+                question: "How do you ask a question?",
+                options: [
+                    "The bird is fast?",
+                    "Is the bird fast?",
+                    "Fast is the bird?"
+                ],
+                correctIndex: 1,
+                explanation: "The verb 'To Be' goes to the beginning: 'Is the bird fast?'"
+            },
+            {
+                category: "Grammar: To Be",
+                question: "Complete the sentence: 'You ___ in the courtroom.'",
+                options: ["is", "am", "are"],
+                correctIndex: 2,
+                explanation: "We use 'ARE' with 'You'."
+            },
+            // GRAMMAR 2: PRESENT CONTINUOUS
+            {
+                category: "Grammar: Actions",
+                question: "What is happening now? 'The Coyote ___.'",
+                options: ["is run", "is running", "are running"],
+                correctIndex: 1,
+                explanation: "Verb To Be (is) + Verb-ING (running)."
+            },
+            {
+                category: "Grammar: Actions",
+                question: "What is happening now? 'The piano ___.'",
+                options: ["is falling", "are falling", "am falling"],
+                correctIndex: 0,
+                explanation: "The piano (it) takes 'IS' + 'falling'."
+            },
+            {
+                category: "Grammar: Actions",
+                question: "Complete the question: 'What ___ he doing?'",
+                options: ["are", "am", "is"],
+                correctIndex: 2,
+                explanation: "'What IS he doing?'"
+            },
+            {
+                category: "Grammar: Actions",
+                question: "Complete: 'They are ___ to the judge.'",
+                options: ["speak", "speaking", "speaks"],
+                correctIndex: 1,
+                explanation: "We need the -ING form: 'speaking'."
+            },
+            {
+                category: "Grammar: Actions",
+                question: "Which sentence is correct?",
+                options: [
+                    "He is driving a car.",
+                    "He driving a car.",
+                    "He are driving a car."
+                ],
+                correctIndex: 0,
+                explanation: "We need the Verb To Be (is) + Verb-ING (driving)."
+            }
+        ];
+
+        // --- 3. App State ---
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let hasAnswered = false;
+
+        // --- 4. Navigation Functions ---
+        function switchScreen(oldId, newId) {
+            document.getElementById(oldId).classList.replace('active', 'previous');
+            document.getElementById(newId).classList.remove('previous');
+            document.getElementById(newId).classList.add('active');
+        }
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            switchScreen('screen-login', 'screen-quiz');
+            loadQuestion();
+        }
+
+        function restartApp() {
+            switchScreen('screen-results', 'screen-login');
+        }
+
+        // --- 5. Quiz Logic ---
+        function loadQuestion() {
+            hasAnswered = false;
+            const q = questions[currentQuestionIndex];
+            
+            // Update UI
+            document.getElementById('q-counter').innerText = `${currentQuestionIndex + 1}/15`;
+            
+            const catEl = document.getElementById('q-category');
+            catEl.innerText = q.category;
+
+            document.getElementById('q-text').innerText = q.question;
+            document.getElementById('progress-bar').style.width = `${((currentQuestionIndex) / 15) * 100}%`;
+            
+            // Render Options
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn text-left p-5 text-xl w-full text-center';
+                btn.innerText = opt;
+                btn.onclick = () => selectOption(index, btn);
+                container.appendChild(btn);
+            });
+
+            // Reset Footer & Feedback
+            const nextBtn = document.getElementById('btn-next');
+            nextBtn.innerText = "CONFIRM ANSWER";
+            nextBtn.disabled = true;
+            
+            const fb = document.getElementById('feedback-area');
+            fb.classList.add('hidden');
+        }
+
+        let selectedIndex = null;
+        let selectedBtnEl = null;
+
+        function selectOption(index, btnEl) {
+            if(hasAnswered) return;
+
+            selectedIndex = index;
+            selectedBtnEl = btnEl;
+
+            // Remove selected class from all
+            document.querySelectorAll('.option-btn').forEach(b => {
+                b.classList.remove('selected');
+            });
+
+            // Add selected class to clicked
+            btnEl.classList.add('selected');
+
+            // Enable Confirm button
+            const nextBtn = document.getElementById('btn-next');
+            nextBtn.disabled = false;
+        }
+
+        function checkAnswer() {
+            hasAnswered = true;
+            const q = questions[currentQuestionIndex];
+            const isCorrect = (selectedIndex === q.correctIndex);
+            const fb = document.getElementById('feedback-area');
+            const nextBtn = document.getElementById('btn-next');
+
+            if(isCorrect) {
+                score++;
+                selectedBtnEl.classList.replace('selected', 'correct');
+                fb.classList.remove('hidden', 'bg-red-100', 'border-acme-red', 'text-acme-red');
+                fb.classList.add('bg-green-100', 'border-acme-green', 'text-green-800');
+                fb.innerText = "CORRECT! " + q.explanation;
+            } else {
+                selectedBtnEl.classList.replace('selected', 'wrong');
+                // Highlight correct one
+                const allBtns = document.querySelectorAll('.option-btn');
+                allBtns[q.correctIndex].classList.add('correct');
+                
+                fb.classList.remove('hidden', 'bg-green-100', 'border-acme-green', 'text-green-800');
+                fb.classList.add('bg-red-100', 'border-acme-red', 'text-acme-red');
+                fb.innerText = "WRONG! " + q.explanation;
+            }
+
+            // Change button action to proceed
+            nextBtn.innerText = (currentQuestionIndex === 14) ? "FINISH TRIAL" : "NEXT QUESTION";
+            nextBtn.onclick = handleNext;
+        }
+
+        function handleNext() {
+            if(currentQuestionIndex < 14) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            document.getElementById('progress-bar').style.width = '100%';
+            setTimeout(() => {
+                switchScreen('screen-quiz', 'screen-results');
+                renderResults();
+            }, 400);
+        }
+
+        function renderResults() {
+            document.getElementById('final-score').innerText = score;
+            const icon = document.getElementById('result-icon');
+            const title = document.getElementById('result-title');
+            const msg = document.getElementById('result-msg');
+
+            if (score >= 13) {
+                icon.innerText = "🏆";
+                title.innerText = "Super Genius";
+                title.classList.replace('text-acme-dark', 'text-acme-blue');
+                msg.innerText = "Amazing! You won the case against ACME. You are an expert!";
+            } else if (score >= 8) {
+                icon.innerText = "🐦";
+                title.innerText = "Road Runner";
+                title.classList.replace('text-acme-dark', 'text-acme-green');
+                msg.innerText = "Beep beep! Good job, but you need to practice a little more to be a genius.";
+            } else {
+                icon.innerText = "🐺";
+                title.innerText = "Wile E. Coyote";
+                title.classList.replace('text-acme-dark', 'text-acme-red');
+                msg.innerText = "Ouch! ACME won the case. Review the Verb To Be and try again!";
+            }
+        }
+
+    </script>
+</body>
+</html>
